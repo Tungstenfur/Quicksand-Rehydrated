@@ -32,5 +32,5 @@ jobs:
         commit: ${{ github.sha }}                # point tag to the current commit
         artifacts: "build/libs/*.jar"
         name: "Automated release ${{ github.run_number }}"
-        body: "Might be unstanble, this is an automatic build"
+        body: "Might be unstable, this is an automatic build, the something-all.jar is used by developers, you probably want the second one"
         prerelease: true
