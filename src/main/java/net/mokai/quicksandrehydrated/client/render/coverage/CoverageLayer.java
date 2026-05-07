@@ -17,8 +17,6 @@ import net.minecraft.client.renderer.texture.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.mokai.quicksandrehydrated.QuicksandRehydrated;
-import net.mokai.quicksandrehydrated.entity.coverage.CoverageEntry;
 import net.mokai.quicksandrehydrated.entity.coverage.PlayerCoverage;
 import net.mokai.quicksandrehydrated.entity.playerStruggling;
 import net.mokai.quicksandrehydrated.registry.ModModelLayers;
@@ -88,26 +86,7 @@ public class CoverageLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
     }
 
     private TextureAtlasSprite[] buildCoverageByPixel(PlayerCoverage coverage) {
-        // Step one: make array with 32 values.
-        // Each value points to a TextureAtlasSprite,
-        // which is the texture that should be applied at that depth.
-        TextureAtlasSprite[] coverageByPixel = new TextureAtlasSprite[32];
-
-        for (CoverageEntry entry : coverage.coverageEntries) {
-            // both begin and end are inclusive
-            for (int i = entry.begin; i <= entry.end; i++) {
-
-                try {
-                    coverageByPixel[i] = CoverageAtlasHolder.singleton.get(entry.texture);
-                } catch (Exception e) {
-                    // If texture can't be loaded, skip this entry (draws empty)
-                    continue;
-                }
-
-            }
-        }
-
-        return coverageByPixel;
+        return CoverageTextureUtils.buildCoverageByPixel(coverage);
     }
 
     private void updateTexture(PlayerCoverage coverage) {
@@ -118,7 +97,7 @@ public class CoverageLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
         // get the texture that should be applied at that depth.
         // if there is no texture to be applied, it sets to the pixel to 0 alpha
 
-        TextureAtlasSprite depthMask = CoverageAtlasHolder.singleton.get(new ResourceLocation(QuicksandRehydrated.MOD_ID, "coverage_mask"));
+        TextureAtlasSprite depthMask = CoverageTextureUtils.getDepthMask(this.coverageModel instanceof PlayerCoverageSlimModel);
         NativeImage img = this.texture.getPixels();
 
         if (img == null) return;
@@ -153,7 +132,7 @@ public class CoverageLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
 
     private void updateSplatterTexture(PlayerCoverage coverage) {
         TextureAtlasSprite[] coverageByPixel = buildCoverageByPixel(coverage);
-        TextureAtlasSprite depthMask = CoverageAtlasHolder.singleton.get(new ResourceLocation(QuicksandRehydrated.MOD_ID, "coverage_mask"));
+        TextureAtlasSprite depthMask = CoverageTextureUtils.getDepthMask(this.coverageModel instanceof PlayerCoverageSlimModel);
         NativeImage img = this.splatterTexture.getPixels();
 
         if (img == null) return;
@@ -211,10 +190,10 @@ public class CoverageLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
             }
             
             // Update texture if needed
-            if (pC.renderUpdate) {
-                pC.renderUpdate = false;
+            if (pC.skinRenderGeneration != pC.renderGeneration) {
                 this.updateTexture(pC);
                 this.updateSplatterTexture(pC);
+                pC.skinRenderGeneration = pC.renderGeneration;
             }
             
             // Get the appropriate model
@@ -225,21 +204,24 @@ public class CoverageLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
             model.prepareMobModel(pAbstractPlayer, pLimbSwing, pLimbSwingAmount, pPartialTick);
             model.setupAnim(pAbstractPlayer, pLimbSwing, pLimbSwingAmount, pAgeInTicks, pNetHeadYaw, pHeadPitch);
 
-            // Set armor visibility flags
-            model.renderHelmet = !pAbstractPlayer.getItemBySlot(EquipmentSlot.HEAD).isEmpty();
-            model.renderChestplate = !pAbstractPlayer.getItemBySlot(EquipmentSlot.CHEST).isEmpty();
-            model.renderLeggings = !pAbstractPlayer.getItemBySlot(EquipmentSlot.LEGS).isEmpty();
-            model.renderBoots = !pAbstractPlayer.getItemBySlot(EquipmentSlot.FEET).isEmpty();
-            
-            // Ensure visibility of all parts, including all second layers
-            model.hat.visible = true;
-            model.leftLeg.visible = true;
-            model.rightLeg.visible = true;
-            model.leftArm.visible = true;
-            model.rightArm.visible = true;
-            model.body.visible = true;
-            model.head.visible = true;
-            
+            boolean hasHelmet = !pAbstractPlayer.getItemBySlot(EquipmentSlot.HEAD).isEmpty();
+            boolean hasChestplate = !pAbstractPlayer.getItemBySlot(EquipmentSlot.CHEST).isEmpty();
+            boolean hasLeggings = !pAbstractPlayer.getItemBySlot(EquipmentSlot.LEGS).isEmpty();
+
+            // Always render base parts; armor coverage is handled in the armor layer.
+            model.renderHelmet = false;
+            model.renderChestplate = false;
+            model.renderLeggings = false;
+            model.renderBoots = false;
+
+            model.head.visible = !hasHelmet;
+            model.hat.visible = !hasHelmet;
+            model.body.visible = !hasChestplate;
+            model.leftArm.visible = !hasChestplate;
+            model.rightArm.visible = !hasChestplate;
+            model.leftLeg.visible = !hasLeggings;
+            model.rightLeg.visible = !hasLeggings;
+
             // Use a translucent render type for better blending
             VertexConsumer vertexconsumer = pBuffer.getBuffer(RenderType.entityTranslucentCull(this.resourcelocation));
             

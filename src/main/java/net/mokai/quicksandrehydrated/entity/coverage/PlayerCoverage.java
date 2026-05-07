@@ -10,6 +10,9 @@ public class PlayerCoverage {
     public List<CoverageEntry> coverageEntries;
     public boolean requiresUpdate = false;
     public boolean renderUpdate = true;
+    public int renderGeneration = 0;
+    public int skinRenderGeneration = -1;
+    public int armorRenderGeneration = -1;
 
     public PlayerCoverage() {
         this.coverageEntries = new ArrayList<>();
@@ -18,6 +21,7 @@ public class PlayerCoverage {
     public void markDirty() {
         requiresUpdate = true;
         renderUpdate = true;
+        renderGeneration++;
     }
 
     public void addCoverageEntry(CoverageEntry newEntry) {

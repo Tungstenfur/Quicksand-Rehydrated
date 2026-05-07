@@ -9,7 +9,8 @@
     "FallingBlockEntityMixin",
     "CanOccludeMixin",
     "SlowdownMixin",
-    "ScreenEffectRendererMixin"
+    "ScreenEffectRendererMixin",
+    "HumanoidArmorLayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
