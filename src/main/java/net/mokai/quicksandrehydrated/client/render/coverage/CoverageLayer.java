@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.mokai.quicksandrehydrated.QuicksandRehydrated;
 import net.mokai.quicksandrehydrated.entity.coverage.CoverageEntry;
 import net.mokai.quicksandrehydrated.entity.coverage.PlayerCoverage;
@@ -223,6 +224,12 @@ public class CoverageLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
             this.getParentModel().copyPropertiesTo(model);
             model.prepareMobModel(pAbstractPlayer, pLimbSwing, pLimbSwingAmount, pPartialTick);
             model.setupAnim(pAbstractPlayer, pLimbSwing, pLimbSwingAmount, pAgeInTicks, pNetHeadYaw, pHeadPitch);
+
+            // Set armor visibility flags
+            model.renderHelmet = !pAbstractPlayer.getItemBySlot(EquipmentSlot.HEAD).isEmpty();
+            model.renderChestplate = !pAbstractPlayer.getItemBySlot(EquipmentSlot.CHEST).isEmpty();
+            model.renderLeggings = !pAbstractPlayer.getItemBySlot(EquipmentSlot.LEGS).isEmpty();
+            model.renderBoots = !pAbstractPlayer.getItemBySlot(EquipmentSlot.FEET).isEmpty();
             
             // Ensure visibility of all parts, including all second layers
             model.hat.visible = true;

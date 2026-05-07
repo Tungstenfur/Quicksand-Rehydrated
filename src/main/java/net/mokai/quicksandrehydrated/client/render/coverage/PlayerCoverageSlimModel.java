@@ -1,4 +1,3 @@
-
 package net.mokai.quicksandrehydrated.client.render.coverage;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -80,20 +79,53 @@ public class PlayerCoverageSlimModel<T extends LivingEntity> extends PlayerCover
             .texOffs(16, 48).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.1F))
             .texOffs(0, 48).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.3F)), 
             PartPose.offset(1.9F, 12.0F, 0.0F));
-            
+
+        // ARMOR PARTS
+        partdefinition.addOrReplaceChild("head_armor", CubeListBuilder.create()
+            .texOffs(0, 0).addBox(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(1.15F)),
+            PartPose.offset(0.0F, 0.0F, 0.0F));
+
+        partdefinition.addOrReplaceChild("body_armor", CubeListBuilder.create()
+            .texOffs(16, 16).addBox(-4.0F, 0.0F, -2.0F, 8.0F, 12.0F, 4.0F, new CubeDeformation(1.15F)),
+            PartPose.offset(0.0F, 0.0F, 0.0F));
+
+        partdefinition.addOrReplaceChild("right_arm_armor", CubeListBuilder.create()
+            .texOffs(40, 16).addBox(-2.0F, -2.0F, -2.0F, 3.0F, 12.0F, 4.0F, new CubeDeformation(1.15F)),
+            PartPose.offset(-5.0F, 2.0F, 0.0F));
+
+        partdefinition.addOrReplaceChild("left_arm_armor", CubeListBuilder.create()
+            .texOffs(32, 48).addBox(-1.0F, -2.0F, -2.0F, 3.0F, 12.0F, 4.0F, new CubeDeformation(1.15F)),
+            PartPose.offset(5.0F, 2.0F, 0.0F));
+
+        // outer generic armor for leggings (leggings use 0.5F typically, so 0.7F coverage)
+        partdefinition.addOrReplaceChild("right_leg_armor_inner", CubeListBuilder.create()
+            .texOffs(0, 16).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.7F)),
+            PartPose.offset(-1.9F, 12.0F, 0.0F));
+
+        partdefinition.addOrReplaceChild("left_leg_armor_inner", CubeListBuilder.create()
+            .texOffs(16, 48).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.7F)),
+            PartPose.offset(1.9F, 12.0F, 0.0F));
+
+        partdefinition.addOrReplaceChild("right_leg_armor_outer", CubeListBuilder.create()
+            .texOffs(0, 16).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(1.15F)),
+            PartPose.offset(-1.9F, 12.0F, 0.0F));
+
+        partdefinition.addOrReplaceChild("left_leg_armor_outer", CubeListBuilder.create()
+            .texOffs(16, 48).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(1.15F)),
+            PartPose.offset(1.9F, 12.0F, 0.0F));
+
+        partdefinition.addOrReplaceChild("right_foot_armor", CubeListBuilder.create()
+            .texOffs(0, 16).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(1.15F)),
+            PartPose.offset(-1.9F, 12.0F, 0.0F));
+
+        partdefinition.addOrReplaceChild("left_foot_armor", CubeListBuilder.create()
+            .texOffs(16, 48).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(1.15F)),
+            PartPose.offset(1.9F, 12.0F, 0.0F));
+
         return LayerDefinition.create(meshdefinition, 64, 64);
     }
 
     public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        // Render all body parts - first layer
-        this.head.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-        this.body.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-        this.rightArm.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-        this.leftArm.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-        this.rightLeg.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-        this.leftLeg.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-        
-        // Render hat (second layer for head) explicitly with full alpha
-        this.hat.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+        super.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
     }
 }
